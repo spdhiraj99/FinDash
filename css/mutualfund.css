@@ -1,0 +1,89 @@
+.card {
+    border-radius: 25px;
+}
+
+.card-button{
+    background: transparent;
+    border: none !important;
+    padding: 0;
+    margin: 0;
+}
+
+.mfTable{
+    text-align: center;
+}
+
+.container{
+    text-align: center;
+}
+
+#loader{
+    text-align: center;
+    margin-top: 5%;
+}
+
+.suggestions ul li{
+    list-style: none;
+}
+
+.suggestions ul{
+    padding-left: 0;
+    background: aliceblue;
+    border-left: #232323 1px solid;
+    border-right: #232323 1px solid;
+    border-bottom: #232323 1px solid;
+    width: max-content;
+}
+
+.height-collapsed{
+    height: 0 !important;
+    overflow: hidden;
+}
+
+.height-expanded{
+    height: 0;
+    overflow: hidden;
+    animation-name: animate;
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
+    animation-iteration-count: 1
+}
+
+@keyframes animate {
+    from {height: 0;}
+  to {height:max-content;}
+}
+
+.modal-content{
+    left: -50%;
+    width: 200%;
+}
+/* center karna ho toh kar le na
+
+.modal-dialog{
+    max-width: 100%;
+    min-width: 60%;
+    width: auto !important;
+    display: inline-block;
+}
+
+.modal {
+    text-align: center;
+    padding: 0!important;
+  }
+  .modal:before {
+    content: '';
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+    margin-right: -4px;
+  }
+  .modal-dialog {
+    display: inline-block;
+    text-align: left;
+    vertical-align: middle;
+  } */
+  
+  .input-search{
+    width:100%;
+  }
