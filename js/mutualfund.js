@@ -112,8 +112,9 @@ async function renderMfeList() {
                                 <th scope="col">units</th>
                                 <th scope="col">current NAV</th>
                                 <th scope="col">current Amount</th>
-                                <th scope="col">profit</th>
+                                <th scope="col">UnRealized profit</th>
                                 <th scope="col">Redeemable without tax</th>
+                                <th scope="col">Redeemable with tax</th>
                                 <th scope="col">STCG</th>
                                 <th scope="col">LTCG</th>
                             </tr>
@@ -129,6 +130,7 @@ async function renderMfeList() {
         let currentNav = mf.currentNav.toFixed(4);
         let profit = mf.profit.toFixed(2);
         let withdrawNoTax = (mf.withdrawNoTax).toFixed(2);
+        let withdrawTax = (mf.withdrawTax).toFixed(2);
         let stcg = (mf.stcg).toFixed(2);
         let ltcg = (mf.ltcg).toFixed(2);
         let htmlChunk = `<tr>
@@ -143,6 +145,7 @@ async function renderMfeList() {
         else
             htmlChunk +=   `<td style="color:red">₹ ${profit}</td>`
         htmlChunk +=       `<td>₹ ${withdrawNoTax}</td>
+                            <td>₹ ${withdrawTax}</td>
                             <td>₹ ${stcg}</td>
                             <td>₹ ${ltcg}</td>
                         </tr>`
