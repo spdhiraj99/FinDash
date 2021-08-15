@@ -40,8 +40,8 @@ async function postData(url, body) {
 }
 
 // delete Mf From repo
-async function deleteMf(id){
-    let url = `http://localhost:9090/v1/api/mutualfund/delete/`+id;
+async function deleteMf(id) {
+    let url = `http://localhost:9090/v1/api/mutualfund/delete/` + id;
     let res = await fetch(url);
     if (res.status >= 400 && res.status < 600) {
         alert("couldn't delete, SERVER ERROR");
@@ -83,7 +83,7 @@ async function postDataToAddMf() {
             document.getElementById('fundNameErr').classList.add('hideEle');
             $j('#addMf').modal('hide');
             alert('Added');
-            renderMfList();
+            renderMfeList();
         } else {
             //post failed, set error
             document.getElementById('postError').classList.remove('hideEle');
@@ -94,12 +94,76 @@ async function postDataToAddMf() {
     }
 }
 
+// to render html for mf list Extended (consolidated mf List)
+async function renderMfeList() {
+    switchLoaderVisibility("loader");
+    switchLoaderVisibility("listMfDiv");
+    let url = 'http://localhost:9090/v1/api/mutualfund/details';
+    const mfList = await fetchData(url);
+    let i = 1;
+    let renderHtml = ''
+    let tableTop = `<div class="mfTable">
+                      <table class="table table-primary table-hover mt-5">
+                        <thead class="table-dark">
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Invested Amount</th>
+                                <th scope="col">units</th>
+                                <th scope="col">current NAV</th>
+                                <th scope="col">current Amount</th>
+                                <th scope="col">profit</th>
+                                <th scope="col">Redeemable without tax</th>
+                                <th scope="col">STCG</th>
+                                <th scope="col">LTCG</th>
+                            </tr>
+                        </thead>
+                        <tbody>`
+
+    let tableBottom = `</tbody>
+                      </table>
+                    </div>`
+
+    renderHtml += tableTop
+    mfList.forEach(mf => {
+        let currentNav = mf.currentNav.toFixed(4);
+        let profit = mf.profit.toFixed(2);
+        let withdrawNoTax = (mf.withdrawNoTax).toFixed(2);
+        let stcg = (mf.stcg).toFixed(2);
+        let ltcg = (mf.ltcg).toFixed(2);
+        let htmlChunk = `<tr>
+                            <th scope="row">${i}</th>
+                            <td>${mf.name}</td>
+                            <td>₹ ${mf.investedAmt}</td>
+                            <td>${mf.units}</td>
+                            <td>${currentNav}</td>
+                            <td>₹ ${mf.currentAmt}</td>`
+        if (profit > 0)
+            htmlChunk +=   `<td style="color:green">₹ ${profit}</td>`
+        else
+            htmlChunk +=   `<td style="color:red">₹ ${profit}</td>`
+        htmlChunk +=       `<td>₹ ${withdrawNoTax}</td>
+                            <td>₹ ${stcg}</td>
+                            <td>₹ ${ltcg}</td>
+                        </tr>`
+        renderHtml += htmlChunk
+        i += 1;
+    });
+
+    renderHtml += tableBottom;
+    let ele = document.getElementById("listMfDiv");
+    switchLoaderVisibility("loader");
+    switchLoaderVisibility("listMfDiv");
+    ele.innerHTML = renderHtml;
+}
+
 // to render html for mf list
 async function renderMfList(mode) {
     switchLoaderVisibility("loader");
     switchLoaderVisibility("listMfDiv");
     let url = 'http://localhost:9090/v1/api/mutualfund/info';
     const mfList = await fetchData(url);
+    let i = 1;
     let renderHtml = ''
     let tableTop = `<div class="mfTable">
                       <table class="table table-primary table-hover mt-5">
@@ -112,10 +176,10 @@ async function renderMfList(mode) {
                                 <th scope="col">Invested Amount</th>
                                 <th scope="col">units</th>
                                 <th scope="col">current Amount</th>`
-    if(mode == "modify"){
-        tableTop +=            `<th scope="col">Action</th>`
+    if (mode == "modify") {
+        tableTop += `<th scope="col">Action</th>`
     }
-    tableTop +=             `</tr>
+    tableTop += `</tr>
                         </thead>
                         <tbody>`
 
@@ -127,20 +191,21 @@ async function renderMfList(mode) {
     mfList.forEach(mf => {
         let currentAmt = parseFloat(mf.currentAmt).toFixed(2);
         let htmlChunk = `<tr>
-                            <th scope="row">${mf.id}</th>
+                            <th scope="row">${i}</th>
                             <td>${mf.name}</td>
                             <td>${mf.purchaseDate}</td>
                             <td>${mf.purchaseNav}</td>
                             <td>₹ ${mf.investedAmt}</td>
                             <td>${mf.units}</td>
                             <td>₹ ${currentAmt}</td>`
-        if(mode == "modify"){
-                htmlChunk+=`<td>
-                                <button class="btn" onclick="deleteMf(`+mf.id+`)"><i class="bi bi-trash"></i></button>
+        if (mode == "modify") {
+            htmlChunk += `<td>
+                                <button class="btn" onclick="deleteMf(`+ mf.id + `)"><i class="bi bi-trash"></i></button>
                             </td>`
         }
-        htmlChunk+=     `</tr>`
+        htmlChunk += `</tr>`
         renderHtml += htmlChunk
+        i += 1;
     });
 
     renderHtml += tableBottom;
