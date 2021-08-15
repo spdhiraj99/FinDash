@@ -22,17 +22,14 @@
     margin-top: 5%;
 }
 
-.suggestions ul li{
-    list-style: none;
+.search-item{
+    color: black;
+    text-decoration: none;
 }
-
-.suggestions ul{
-    padding-left: 0;
-    background: aliceblue;
-    border-left: #232323 1px solid;
-    border-right: #232323 1px solid;
-    border-bottom: #232323 1px solid;
-    width: max-content;
+.search-list a:hover{
+    color: rgb(0, 0, 0);
+    background: #78a0eb;
+    cursor: pointer;
 }
 
 .height-collapsed{
@@ -85,5 +82,5 @@
   } */
   
   .input-search{
-    width:100%;
+    width:88%;
   }

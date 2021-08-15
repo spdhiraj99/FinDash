@@ -1,3 +1,5 @@
+var $j = jQuery.noConflict();
+
 function switchLoaderVisibility(element) {
     var loader = document.getElementById(element);
     loader.classList.toggle('hideEle');
@@ -10,6 +12,68 @@ async function fetchData(url) {
         return await res.json();
     } catch (error) {
         console.log(error);
+    }
+}
+
+async function postData(url, body) {
+    const settings = {
+        method: 'POST',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body)
+    };
+    try {
+        const fetchResponse = await fetch(url, settings);
+        if (fetchResponse.status >= 400 && fetchResponse.status < 600) {
+            throw new Error("Bad response from server");
+        }
+        if (fetchResponse.ok) {
+            return true;
+        }
+    } catch (e) {
+        return false;
+    }
+    return false;
+}
+
+async function postDataToAddMf() {
+    let mfName = document.getElementById('mfsearchText').value;
+    let mfPurDate = document.getElementById('purchaseDate').value;
+    mfPurDate = mfPurDate.split('-')[2] + '-' + mfPurDate.split('-')[1] + '-' + + mfPurDate.split('-')[0]
+    let mfELper = document.getElementById('exLoadPer').value;
+    let mfELDay = document.getElementById('exLoadDay').value;
+    let mfEL = mfELper + ' ' + mfELDay;
+    let investedAmt = document.getElementById('investedAmt').value;
+    let fundId = document.getElementById('fundId').innerText;
+    const mfData = {
+        name: mfName,
+        purchaseDate: mfPurDate,
+        exitLoad: mfEL,
+        lockPeriod: null,
+        investedAmt: investedAmt,
+        units: null,
+        fundId: fundId
+    }
+    if (fundId != undefined && fundId != null && fundId.length > 0) {
+        //fundId is there, can post, hide err if any
+        document.getElementById('fundNameErr').classList.add('hideEle');
+        let res = await postData('http://localhost:9090/v1/api/mutualfund/add', mfData);
+        if (res === true) {
+            //post successful remove error messages   
+            document.getElementById('postError').classList.add('hideEle');
+            document.getElementById('fundNameErr').classList.add('hideEle');
+            $j('#addMf').modal('hide');
+            alert('Added');
+            renderMfList();
+        } else {
+            //post failed, set error
+            document.getElementById('postError').classList.remove('hideEle');
+        }
+    } else {
+        //fundId not found, set error
+        document.getElementById('fundNameErr').classList.remove('hideEle');
     }
 }
 
@@ -73,7 +137,7 @@ async function searchMfApi() {
     renderHtml += '</div>';
     let ele = document.getElementById("suggestions");
     ele.innerHTML = renderHtml;
-    if(mfList.length>0){
+    if (mfList.length > 0) {
         animateHeight();
     }
 }
@@ -82,15 +146,47 @@ function setFundId(ele, value) {
     let fundName = document.getElementById("mfsearchText");
     fundName.value = ele.innerText;
     let fundId = document.getElementById("fundId");
-    fundId.innerHTML=value;
+    fundId.innerHTML = value;
     let searchList = document.getElementById('search-list');
     searchList.style.display = "none";
 }
 
 //animate height
-function animateHeight(){
+function animateHeight() {
     let ele = document.getElementById('search-list');
     ele.classList.remove("height-collapsed");
-    
     ele.classList.add("height-expanded");
 }
+
+
+
+// modal control
+$j(document).on('shown.bs.modal', function (e) {
+    $j('input:visible:enabled:first', e.target).focus();
+    //set max date
+    document.getElementById('purchaseDate').max = new Date().toISOString().split("T")[0];
+    //control num field
+    let investedAmt = document.getElementById("investedAmt");
+    let exitLoadPer = document.getElementById("exLoadPer");
+    let exLoadDay = document.getElementById('exLoadDay');
+    const invalidChars = [
+        "-",
+        "+",
+        "e",
+    ];
+    investedAmt.addEventListener("keydown", function (e) {
+        if (invalidChars.includes(e.key)) {
+            e.preventDefault();
+        }
+    });
+    exitLoadPer.addEventListener("keydown", function (e) {
+        if (invalidChars.includes(e.key)) {
+            e.preventDefault();
+        }
+    });
+    exLoadDay.addEventListener("keydown", function (e) {
+        if (invalidChars.includes(e.key)) {
+            e.preventDefault();
+        }
+    });
+});
