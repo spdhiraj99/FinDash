@@ -76,7 +76,6 @@ async function searchMfApi() {
     if(mfList.length>0){
         animateHeight();
     }
-    //setFundId();
 }
 // get the fundId from select
 function setFundId(ele, value) {
