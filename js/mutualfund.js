@@ -5,7 +5,7 @@ function switchLoaderVisibility(element) {
     loader.classList.toggle('hideEle');
 }
 
-//to fetch data from api
+//to fetch data from api - GET
 async function fetchData(url) {
     try {
         let res = await fetch(url);
@@ -15,6 +15,7 @@ async function fetchData(url) {
     }
 }
 
+// to fetch data from API - POST
 async function postData(url, body) {
     const settings = {
         method: 'POST',
@@ -38,6 +39,22 @@ async function postData(url, body) {
     return false;
 }
 
+// delete Mf From repo
+async function deleteMf(id){
+    let url = `http://localhost:9090/v1/api/mutualfund/delete/`+id;
+    let res = await fetch(url);
+    if (res.status >= 400 && res.status < 600) {
+        alert("couldn't delete, SERVER ERROR");
+        return;
+    }
+    if (res.ok) {
+        alert("Deleted");
+        renderMfList("modify");
+        return;
+    }
+}
+
+// post data to add MF Record to repo
 async function postDataToAddMf() {
     let mfName = document.getElementById('mfsearchText').value;
     let mfPurDate = document.getElementById('purchaseDate').value;
@@ -78,7 +95,7 @@ async function postDataToAddMf() {
 }
 
 // to render html for mf list
-async function renderMfList() {
+async function renderMfList(mode) {
     switchLoaderVisibility("loader");
     switchLoaderVisibility("listMfDiv");
     let url = 'http://localhost:9090/v1/api/mutualfund/info';
@@ -94,8 +111,11 @@ async function renderMfList() {
                                 <th scope="col">Purchase Nav</th>
                                 <th scope="col">Invested Amount</th>
                                 <th scope="col">units</th>
-                                <th scope="col">current Amount</th>
-                            </tr>
+                                <th scope="col">current Amount</th>`
+    if(mode == "modify"){
+        tableTop +=            `<th scope="col">Action</th>`
+    }
+    tableTop +=             `</tr>
                         </thead>
                         <tbody>`
 
@@ -113,8 +133,13 @@ async function renderMfList() {
                             <td>${mf.purchaseNav}</td>
                             <td>₹ ${mf.investedAmt}</td>
                             <td>${mf.units}</td>
-                            <td>₹ ${currentAmt}</td>
-                        </tr>`
+                            <td>₹ ${currentAmt}</td>`
+        if(mode == "modify"){
+                htmlChunk+=`<td>
+                                <button class="btn" onclick="deleteMf(`+mf.id+`)"><i class="bi bi-trash"></i></button>
+                            </td>`
+        }
+        htmlChunk+=     `</tr>`
         renderHtml += htmlChunk
     });
 
